@@ -28,7 +28,7 @@ def upload_file():
             secure_filename(file.filename)
         )
         file.save(fp)
-        notes = pipeline.transform_23_and_me_dataset_to_notes(fp)
+        [notes, detectedSnps] = pipeline.transform_23_and_me_dataset_to_notes(fp)        
         os.remove(fp)
 
         # hook these up
@@ -42,11 +42,9 @@ def upload_file():
     elif request.method == 'GET':
         return render_template('upload.html')
 
-
 @application.route('/resources/soundfonts/choir_aahs-mp3.js')
 def root():
     return redirect('https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/FluidR3_GM/choir_aahs-mp3.js')
-
 
 if __name__ == "__main__":
     application.run(debug=True)
