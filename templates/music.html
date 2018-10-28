@@ -23,7 +23,6 @@ function setup() {
   a.fx.add( Reverb({ roomSize: Add( .75, Sine( .05, .245 )._ ) }) )
 
   snp_notes = [{{notes}}]
-
   {% if caffeine == 'high' %}
   a.note.seq( snp_notes, 1/16 )
   {% else %}
