@@ -1,5 +1,5 @@
 <head>
-  <title>leit·mo·tif</title>
+  <title>23symphony</title>
   <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
   <script src="{{ url_for('static', filename='p5.gibber.js') }}"></script>
@@ -31,15 +31,16 @@ function setup() {
   drums = EDrums( 'xo-o' )
   {% if schizophrenia %}
   a = FM({ maxVoices:4, index:10, cmRatio:1.0333 })
+  a.note.seq( {{notes}}, [1/4,1/2].rnd() )
   {% else %}
   a = Pluck()
+  a.amp = 0.5
+  a.note.seq( {{notes}}, [1/4,1/8,1/2].rnd() )
   {% endif %}
   a.fx.add( Reverb({ roomSize: Add( .75, Sine( .05, .245 )._ ) }) )
-  {% if caffeine %}
-  a.note.seq( {{notes}}, 1/16 )
-  {% else %}
-  a.note.seq( {{notes}}, 1/8 )
-  {% endif %}
+  bass = Mono('bass')
+  bass.note.seq( [0,7], 1/8 )
+  bass.amp = 0.4
 
   w = width+16;
   dx = (TWO_PI / period) * xspacing;
@@ -64,7 +65,7 @@ function calcWave() {
 
   // Append value to wave up to a limit
   var amplitude = 10 * 30;
-  curr_val = sin(x)*100;
+  curr_val = sin(1.5*x)*100;
   weighted_val = (0.7 * prior_curr) + (0.3 * curr_val)
 
   if (yvalues.length <= MAX_ARR_SIZE) {
@@ -89,14 +90,10 @@ function renderWave() {
     var reverse_strand_h = height/2+inv_yvalues[x]
     ellipse(x*xspacing, forward_strand_h, 16, 16);
     ellipse(x*xspacing, reverse_strand_h, 16, 16);
-    //Draw line: https://p5js.org/examples/form-points-and-lines.html
-    line(forward_strand_h, reverse_strand_h, forward_strand_h, reverse_strand_h);
   }
 }
-
 </script>
 <body>
-
   <div class="navbar navbar-light bg-light">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
@@ -107,10 +104,10 @@ function renderWave() {
       <a class="btn btn-primary" href="upload">Upload another SNP dataset</a>
     </div>
   </div>
-  {% if caffeine %}
+  {% if schizophrenia %}
   <div class="container">
-    <div class="jumbtron">
-      <h2>You have high caffeine metabolism. We have increased the time signature to 8/4.</h2>
+    <div class="jumbtron" style="padding:50px;">
+      <h2>You have risk factors for cannabis-induced psychosis. We have changed the intruments</h2>
     </div>
   </div>
   {% endif %}
