@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>leit·mo·tif</title>
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<style>
+  h1 {
+    text-align: center;
+    font-size: 2em;
+  }
+</style>
+<script>
+  $(function() {
+
+    // We can attach the `fileselect` event to all file inputs on the page
+    $(document).on('change', ':file', function() {
+      var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+      input.trigger('fileselect', [numFiles, label]);
+    });
+
+    // We can watch for our custom `fileselect` event like this
+    $(document).ready(function() {
+      $(':file').on('fileselect', function(event, numFiles, label) {
+
+        var input = $(this).parents('.input-group').find(':text'),
+          log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+        if (input.length) {
+          input.val(log);
+        } else {
+          if (log) alert(log);
+        }
+
+      });
+    });
+
+  });
+</script>
+
+<body>
+  <div class="container animated flipInX" style="margin-top:250px">
+    <div class="jumbotron">
+      <div class="animated bounceInDown">
+        <h1>So glad you decided to join us!</h1>
+        <h1>To get started, please upload your SNP data.</h1>
+      </div>
+      <div class="animated bounceInUp" style="padding-left:250px; padding-right:250px; padding-top:50px;">
+        <form method=post enctype=multipart/form-data style="width:100%">
+          <input type=file name=file style="width:450px;">
+          <input type=submit value=Upload>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for
 import pipeline
 import os
 from os import path
@@ -31,7 +31,7 @@ def upload_file():
         notes = pipeline.transform_23_and_me_dataset_to_notes(fp)
         os.remove(fp)
         return render_template("music.html",
-                               notes=notes)
+                               notes=','.join(str(note) for note in notes))
     elif request.method == 'GET':
         return render_template('upload.html')
 
