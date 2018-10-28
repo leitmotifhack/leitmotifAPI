@@ -2,6 +2,7 @@
   <title>p5.Gibber.js - mouse/bass example</title>
   <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
   <script src="{{ url_for('static', filename='p5.gibber.js') }}"></script>
+  <script src="{{ url_for('static', filename='p5.sound.min.js') }}"></script>
 </head>
 <style>
 body {
@@ -10,46 +11,73 @@ body {
 }
 </style>
 <script>
-//function preload() { startGibber() }
+var xspacing = 16;    // Distance between each horizontal location
+var w;                // Width of entire wave
+var theta = 0.0;      // Start angle at 0
+var amplitude = 75.0; // Height of wave
+var period = 500.0;   // How many pixels before the wave repeats
+var dx;               // Value for incrementing x
+var yvalues;  // Using an array to store height values for the wave
+var fftSize = 32
 
 function setup() {
-  createCanvas( windowWidth, windowHeight )
-
+  createCanvas( windowWidth, windowHeight );
+  w = width+16;
+  dx = (TWO_PI / period) * xspacing;
+  yvalues = new Array(floor(w/xspacing));
+/*
+  a = Pluck()
+  a.note.seq( [{{notes}}], 1/8 )
+*/
   drums = EDrums( 'x*o*x*o-' )
+  drums.amp = .5
 
   sampler = Sampler().record( drums, 1 )
-    .note.seq( [1,2], [1/4,1/8,1/2].rnd() )
-    .fx.add( Delay(1/64))
-    .pan.seq( Rndf(-1,1) )
+  .note.seq( [1,2], [1/4,1/8,1/2].rnd() )
+  .fx.add( Delay(1/64))
+  .pan.seq( Rndf(-1,1) )
+
+  rhodes = Synth( 'rhodes', {amp:.1} )
+    .chord.seq( Rndi(0,6,3), 1 )
+    .fx.add( Delay() )
+
+  fft = FFT( fftSize )
 
   bass = Mono('bass')
-    .note.seq([{{ notes }}], 1/8 )
-
-  Gibber.scale.root.seq( ['c4','eb4'], 1 )
-
-  follow = Follow( Gibber.Master, 1024 )
-
-  background( 64 )
-  noFill()
-  stroke( 10,0,0,127 )
+    .note.seq([{{ notes }}], 1/8 );  
+  
+  Gibber.scale.root.seq( ['c4','eb4'], 1 );
 }
 
 function draw() {
-  var x = mouseX / windowWidth,
-      y = mouseY / windowHeight,
-      ww2 = windowWidth / 2,
-      wh2 = windowHeight / 2,
-      value = follow.getValue(),
-      radius = ( ww2 > wh2 ? wh2 : ww2 ) * value
-
-  bass.resonance = (1 - x) * 5
-  bass.cutoff = (1 - y) / 2
-
-  sampler.fx[0].feedback = x < .99 ? x : .99
-
-  strokeWeight( value * 50 )
-  background( 64,64,64,10 )
-  ellipse( ww2, wh2, radius, radius )
+  background(0);
+  calcWave();
+  renderWave();
 }
+
+function calcWave() {
+  // Increment theta (try different values for 
+  // 'angular velocity' here)
+  theta += 0.02;
+
+  // For every x value, calculate a y value with sine function
+  var x = theta;
+  amplitude = bass.Amplitude;
+  for (var i = 0; i < yvalues.length; i++) {
+
+    yvalues[i] = sin(x)*amplitude;
+    x+=dx;
+  }
+}
+
+function renderWave() {
+  noStroke();
+  fill(255);
+  // A simple way to draw the wave with an ellipse at each location
+  for (var x = 0; x < yvalues.length; x++) {
+    ellipse(x*xspacing, height/2+yvalues[x], 16, 16);
+  }
+}
+
 </script>
 <body></body>
