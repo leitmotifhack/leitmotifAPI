@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for, redirect
+from flask import Flask, request, render_template, redirect
 import pipeline
 import os
 from os import path
@@ -32,8 +32,8 @@ def upload_file():
         os.remove(fp)
 
         # hook these up
-        caffeine = 'high'
-        psychosis = False
+        caffeine = 'low'
+        psychosis = True
 
         return render_template("music.html",
                                notes=','.join(str(note) for note in notes),
