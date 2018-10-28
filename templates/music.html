@@ -18,17 +18,19 @@ var amplitude = 75.0; // Height of wave
 var period = 500.0;   // How many pixels before the wave repeats
 var dx;               // Value for incrementing x
 var yvalues;  // Using an array to store height values for the wave
-var fftSize = 32
+var prior_curr = 30; // default val
+var sine_wave = []  // This will be a evolving sine wave
+var inv_yvalues
+
 
 function setup() {
   createCanvas( windowWidth, windowHeight );
   w = width+16;
   dx = (TWO_PI / period) * xspacing;
-  yvalues = new Array(floor(w/xspacing));
-/*
-  a = Pluck()
-  a.note.seq( [{{notes}}], 1/8 )
-*/
+  yvalues = new Array();
+  inv_yvalues = new Array();
+  MAX_ARR_SIZE = floor(w/xspacing)
+
   drums = EDrums( 'x*o*x*o-' )
   drums.amp = .5
 
@@ -40,11 +42,6 @@ function setup() {
   rhodes = Synth( 'rhodes', {amp:.1} )
     .chord.seq( Rndi(0,6,3), 1 )
     .fx.add( Delay() )
-
-  fft = FFT( fftSize )
-
-  bass = Mono('bass')
-    .note.seq([{{ notes }}], 1/8 );  
   
   Gibber.scale.root.seq( ['c4','eb4'], 1 );
 }
@@ -62,12 +59,23 @@ function calcWave() {
 
   // For every x value, calculate a y value with sine function
   var x = theta;
-  amplitude = bass.Amplitude;
-  for (var i = 0; i < yvalues.length; i++) {
 
-    yvalues[i] = sin(x)*amplitude;
-    x+=dx;
+  // Append value to wave up to a limit
+  var amplitude = sampler.pitch * 30;
+  curr_val = sin(x)*100;
+  weighted_val = (0.7 * prior_curr) + (0.3 * curr_val)
+
+  if (yvalues.length <= MAX_ARR_SIZE) {
+    yvalues.push(curr_val)
+    inv_yvalues.push(-1 * curr_val);
+  } else {
+    yvalues.push(curr_val);
+    inv_yvalues.push(-1 * curr_val);
+    yvalues.splice(0, 1);
+    inv_yvalues.splice(0, 1);
   }
+
+  prior_curr = curr_val;
 }
 
 function renderWave() {
@@ -75,7 +83,12 @@ function renderWave() {
   fill(255);
   // A simple way to draw the wave with an ellipse at each location
   for (var x = 0; x < yvalues.length; x++) {
-    ellipse(x*xspacing, height/2+yvalues[x], 16, 16);
+    var forward_strand_h = height/2+yvalues[x];
+    var reverse_strand_h = height/2+inv_yvalues[x]
+    ellipse(x*xspacing, forward_strand_h, 16, 16);
+    ellipse(x*xspacing, reverse_strand_h, 16, 16);
+    //Draw line: https://p5js.org/examples/form-points-and-lines.html
+    line(forward_strand_h, reverse_strand_h, forward_strand_h, reverse_strand_h);
   }
 }
 
