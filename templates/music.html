@@ -1,5 +1,6 @@
 <head>
   <title>leit·mo·tif</title>
+  <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
   <script src="{{ url_for('static', filename='p5.gibber.js') }}"></script>
 </head>
@@ -10,8 +11,6 @@ body {
 }
 </style>
 <script>
-//function preload() { startGibber() }
-
 function setup() {
   createCanvas( windowWidth, windowHeight )
   drums = EDrums( 'xo-o' )
@@ -33,4 +32,12 @@ function draw() {
   background( 64 )
 }
 </script>
-<body></body>
+<body>
+<div class="container">
+  <div class="jumbtron">
+    {% if caffeine == 'high' %}
+    <h2>You have high caffeine metabolism. We have increased the time signature to 8/4.</h2>
+    {% endif %}
+  </div>
+</div>
+</body>
