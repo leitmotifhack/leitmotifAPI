@@ -3,7 +3,7 @@ import pandas as pd
 import random
 
 
-PENTATONIC_SCALE = [440, 495, 556.875, 660, 742.5]  # A  # B  # C#  # E  # F
+PENTATONIC_SCALE = [440, 495, 556.875, 660, 742.5]  # A, B, C#, E, F
 FREQ2MIDI = {
     440: 69,  # A
     495: 71,  # B
