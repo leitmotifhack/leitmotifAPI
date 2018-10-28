@@ -103,4 +103,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 
- /my_virtual_environment/
+my_virtual_environment/
