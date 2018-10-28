@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for
+from flask import Flask, request, render_template, url_for, redirect
 import pipeline
 import os
 from os import path
@@ -30,10 +30,22 @@ def upload_file():
         file.save(fp)
         notes = pipeline.transform_23_and_me_dataset_to_notes(fp)
         os.remove(fp)
+
+        # hook these up
+        caffeine = 'high'
+        psychosis = False
+
         return render_template("music.html",
-                               notes=','.join(str(note) for note in notes))
+                               notes=','.join(str(note) for note in notes),
+                               caffeine=caffeine,
+                               psychosis=psychosis)
     elif request.method == 'GET':
         return render_template('upload.html')
+
+
+@application.route('/resources/soundfonts/choir_aahs-mp3.js')
+def root():
+    return redirect('https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/FluidR3_GM/choir_aahs-mp3.js')
 
 
 if __name__ == "__main__":
