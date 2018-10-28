@@ -18,10 +18,10 @@ def length_gen(n):
     return int(3.5 + math.sin(n / 2) + (2.5 * math.cos(n)) + random.random())
 
 
-def transform_23_and_me_dataset_to_notes(_23_and_me_txt, num_notes=1000):
+def transform_23_and_me_dataset_to_notes(_23_and_me_fp, num_notes=1000):
     """transform 23&me snps randomly into notes"""
     snps_df = pd.read_csv(
-        StringIO(_23_and_me_txt),
+        _23_and_me_fp,
         header=20,
         names=["rsid", "chrom", "pos", "geno"],
         delimiter="\t",
