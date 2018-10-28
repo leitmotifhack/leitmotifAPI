@@ -14,18 +14,16 @@ body {
 function setup() {
   createCanvas( windowWidth, windowHeight )
   drums = EDrums( 'xo-o' )
-  {% if psychosis == True %}
+  {% if schizophrenia %}
   a = FM({ maxVoices:4, index:10, cmRatio:1.0333 })
   {% else %}
   a = Pluck()
   {% endif %}
   a.fx.add( Reverb({ roomSize: Add( .75, Sine( .05, .245 )._ ) }) )
-
-  snp_notes = [{{notes}}]
-  {% if caffeine == 'high' %}
-  a.note.seq( snp_notes, 1/16 )
+  {% if caffeine %}
+  a.note.seq( {{notes}}, 1/16 )
   {% else %}
-  a.note.seq( snp_notes, 1/8 )
+  a.note.seq( {{notes}}, 1/8 )
   {% endif %}
 }
 function draw() {
@@ -33,11 +31,11 @@ function draw() {
 }
 </script>
 <body>
-<div class="container">
-  <div class="jumbtron">
-    {% if caffeine == 'high' %}
-    <h2>You have high caffeine metabolism. We have increased the time signature to 8/4.</h2>
-    {% endif %}
+  {% if caffeine %}
+  <div class="container">
+    <div class="jumbtron">
+      <h2>You have high caffeine metabolism. We have increased the time signature to 8/4.</h2>
+    </div>
   </div>
-</div>
+  {% endif %}
 </body>

@@ -26,32 +26,30 @@ def transform_23_and_me_dataset_to_notes(_23_and_me_fp, num_notes=1000):
         delimiter="\t",
         low_memory=False,
     )
-    snps_df = snps_df[snps_df.geno != "--"].reset_index()
-    snps_df = snps_df.drop(columns="index")
+    snps_df = snps_df[snps_df.geno != "--"]
+    snps_df = snps_df.set_index('rsid')
 
     # search the SNPS
-    depression = depression_detector(snps_df)
     caffeine = caffeine_detector(snps_df)
     schizophrenia = schizophrenia_detector(snps_df)
+    depression = depression_detector(snps_df)
 
     # map to notes
-    snps_df = snps_df[:num_notes]  # crop
+    snps_df = snps_df.sample(n=1000)  # crop
     notes = snps_df.geno.map(
         {snp: random.choice(PENTATONIC_SCALE) for snp in snps_df.geno.unique()}
     )
     notes = list(notes)  # we cannot serialize a numpy array
 
-    # search the SNPS
-    depression = depression_detector(snps_df)
-    caffeine = caffeine_detector(snps_df)
-    schizophrenia = schizophrenia_detector(snps_df)
-
     return notes, depression, caffeine, schizophrenia
 
 
-def generic_detector(rsid, positives, snps_df):
-    genotype_value = snps_df.loc[rsid].geno
-    return any(genotype_value == positive_value for positive_value in positive_values)
+def generic_detector(rsid, positive_snps, snps_df):
+    try:
+        snp = snps_df.loc[rsid].geno
+    except KeyError:
+        raise IOError(snps_df.head())
+    return any(snp == positive_snp for positive_snp in positive_snps)
 
 
 def depression_detector(snps_df):
@@ -65,8 +63,6 @@ def caffeine_detector(snps_df):
 
 
 def schizophrenia_detector(snps_df):
-    return generic_detector(
-        "rs6277", ["CT", "CC"], snps_df
-    ) or generic_detector(
+    return generic_detector("rs6277", ["CT", "CC"], snps_df) or generic_detector(
         "rs1344484", ["TT"], snps_df
     )
