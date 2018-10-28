@@ -3,6 +3,7 @@
   <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   <script src="{{ url_for('static', filename='p5.min.js') }}"></script>
   <script src="{{ url_for('static', filename='p5.gibber.js') }}"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
 </head>
 <style>
 body {
@@ -10,9 +11,23 @@ body {
   margin:0;
 }
 </style>
+
 <script>
+var xspacing = 16;    // Distance between each horizontal location
+var w;                // Width of entire wave
+var theta = 0.0;      // Start angle at 0
+var amplitude = 75.0; // Height of wave
+var period = 500.0;   // How many pixels before the wave repeats
+var dx;               // Value for incrementing x
+var yvalues;  // Using an array to store height values for the wave
+var prior_curr = 30; // default val
+var sine_wave = []  // This will be a evolving sine wave
+var inv_yvalues
+
+
 function setup() {
-  createCanvas( windowWidth, windowHeight )
+  createCanvas( windowWidth, windowHeight );
+
   drums = EDrums( 'xo-o' )
   {% if schizophrenia %}
   a = FM({ maxVoices:4, index:10, cmRatio:1.0333 })
@@ -25,12 +40,73 @@ function setup() {
   {% else %}
   a.note.seq( {{notes}}, 1/8 )
   {% endif %}
+
+  w = width+16;
+  dx = (TWO_PI / period) * xspacing;
+  yvalues = new Array();
+  inv_yvalues = new Array();
+  MAX_ARR_SIZE = floor(w/xspacing)
 }
+
 function draw() {
-  background( 64 )
+  background(0);
+  calcWave();
+  renderWave();
 }
+
+function calcWave() {
+  // Increment theta (try different values for
+  // 'angular velocity' here)
+  theta += 0.02;
+
+  // For every x value, calculate a y value with sine function
+  var x = theta;
+
+  // Append value to wave up to a limit
+  var amplitude = 10 * 30;
+  curr_val = sin(x)*100;
+  weighted_val = (0.7 * prior_curr) + (0.3 * curr_val)
+
+  if (yvalues.length <= MAX_ARR_SIZE) {
+    yvalues.push(curr_val)
+    inv_yvalues.push(-1 * curr_val);
+  } else {
+    yvalues.push(curr_val);
+    inv_yvalues.push(-1 * curr_val);
+    yvalues.splice(0, 1);
+    inv_yvalues.splice(0, 1);
+  }
+
+  prior_curr = curr_val;
+}
+
+function renderWave() {
+  noStroke();
+  fill(255);
+  // A simple way to draw the wave with an ellipse at each location
+  for (var x = 0; x < yvalues.length; x++) {
+    var forward_strand_h = height/2+yvalues[x];
+    var reverse_strand_h = height/2+inv_yvalues[x]
+    ellipse(x*xspacing, forward_strand_h, 16, 16);
+    ellipse(x*xspacing, reverse_strand_h, 16, 16);
+    //Draw line: https://p5js.org/examples/form-points-and-lines.html
+    line(forward_strand_h, reverse_strand_h, forward_strand_h, reverse_strand_h);
+  }
+}
+
 </script>
 <body>
+
+  <div class="navbar navbar-light bg-light">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item active">
+        <span class="navbar-brand mb-0 h1">23·sym·pho·ny <i class="fas fa-dna"></i></span>
+      </li>
+    </ul>
+    <div class="my-2 my-lg-0">
+      <a class="btn btn-primary" href="upload">Upload another SNP dataset</a>
+    </div>
+  </div>
   {% if caffeine %}
   <div class="container">
     <div class="jumbtron">
