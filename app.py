@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 # config
 application = Flask(__name__)
-application.config["UPLOAD_FOLDER"] = "/tmp"
+application.config["UPLOAD_FOLDER"] = "."
 
 @application.route("/")
 def index():
